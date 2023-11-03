@@ -12,6 +12,7 @@ const iconMap = {
   pending: ClockIcon,
   invoices: InboxIcon,
 };
+import { fetchCardData } from "@/app/lib/data";
 
 export default async function CardWrapper() {
   return (
@@ -30,16 +31,37 @@ export default async function CardWrapper() {
   );
 }
 
-export function Card({
+export async function Card({
   title,
-  value,
+
   type,
 }: {
   title: string;
-  value: number | string;
+
   type: "invoices" | "customers" | "pending" | "collected";
 }) {
+  const {
+    numberOfInvoices,
+    numberOfCustomers,
+    totalPaidInvoices,
+    totalPendingInvoices,
+  } = await fetchCardData();
   const Icon = iconMap[type];
+  let value;
+  switch (title) {
+    case "Collected":
+      value = totalPaidInvoices;
+      break;
+    case "Pending":
+      value = totalPendingInvoices;
+      break;
+    case "Total Invoices":
+      value = numberOfInvoices;
+      break;
+    default:
+      value = numberOfCustomers;
+      break;
+  }
 
   return (
     <div className='rounded-xl bg-gray-50 p-2 shadow-sm'>
